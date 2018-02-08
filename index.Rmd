@@ -61,7 +61,7 @@ Due: [Beamer Slides](Beamer_Slides_HW_3.pdf)
 <div id='id-section4'/>
 #### Week 4:    
 
-Due:   
+Due: [HW 4: All Things Vectors](Bio381_Lab_HW_4.html)
       
 
 ------

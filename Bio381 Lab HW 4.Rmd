@@ -1,0 +1,185 @@
+---
+title: "Bio381 Lab 4"
+author: "Luke Daniels"
+date: "2/7/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+
+```
+
+
+# Homework 4 Answers 
+
+1. Suppose x = 1.1, a = 2.2, and b = 3.3. Assign each expression to the value of the variable zand print the value stored in z.
+a.) 
+```{r}
+x <- 1.1 
+a <- 2.2 
+b <- 3.3 
+
+z <- x^((a)^(b))
+
+print(z)
+
+# z = 3.61714
+```
+b.) 
+```{r}
+z <- ((x^a)^b)
+print(z)
+# z = 1.997611
+```
+c.) 
+```{r}
+z <- (3*(x^3))+(2*(x^2)+1)
+print(z)
+# z = 7.413
+```
+d.) 
+```{r}
+z1 <- z %% floor(z)
+print(z1)
+z2 <- floor(z1*10)
+
+
+# floor ((z%% floor(z))*10 
+
+
+print(z2)
+```
+Answer is 4
+
+
+2. Using the rep and seq functions, create the following vectors:
+
+a.) 
+```{r}
+vector <- (c(seq(1:8), seq(from=7, to=1)))
+print(vector)
+ 
+```
+
+b.) 
+
+```{r}
+myVec <- seq(1:5)
+rep(myVec, times= myVec)
+```
+
+c.) 
+```{r}
+rep(1:5,5:1)
+
+```
+
+3.) Create a vector of two random uniform numbers. In a spatial map, these can be interpreted as x and y coordinates that give the location of an individual (such as a marked forest tree in a plot that has been mapped). Using one of R’s inverse trigonometry functions (asin(), acos(), or atan()), convert these numbers into polar coordinates (If you don’t know what polar coordinates are, read about them on the web or in your calculus textbook).
+
+```{r}
+set.seed(100)
+b <- runif(2)
+print(b)
+
+# Pythagorian Theorem 
+r <- sqrt(b[1]^2+b[2]^2)
+#Finding Theta 
+theta <-  atan(b[2]/b[1]) 
+print(theta)
+polarCoordinates <- c(r, theta) 
+print(polarCoordinates)
+# (0.4013915, 0.6970364)
+```
+
+4.) Suppose that queue <- c("sheep", "fox", "owl", "ant") and that queue represents the animals that are lined up to enter Noah’s Ark, with the sheep at the front of the line. Using R expressions, update the queue successively as
+
+a.) 
+```{r}
+queue <- c("sheep", "fox", "owl", "ant")
+
+#a.) the serpent arrives
+
+queue[5] <- ("serpent")
+
+#the sheep enters the ark;
+
+queue <- queue[-1]
+print(queue)
+
+# The donkey moves to the front
+queue <- c("donkey", queue)
+print(queue)
+
+# The serpent leaves
+
+queue <- queue[-5]
+print(queue)
+
+# The owl leaves
+
+queue <- queue[-3]
+
+print(queue)
+# The aphid arrives and move to position in front of ant
+queue <- c(queue[1], queue[2], "aphid", queue[3])
+print(queue)
+
+
+# Determine position of aphid 
+
+which(queue == "aphid")
+```
+
+5.) Use R to create a vector of all of the integers from 1 to 100 that are not divisible by 2, 3, or 7.
+
+```{r}
+RVec <- seq(1:100) 
+print(RVec)
+RVec <- RVec[RVec %% 2 !=0 & RVec%%3 !=0 & RVec%%7 !=0]
+print(RVec)
+```
+
+6.) Create a vector z of 1000 random uniform numbers.
+
+a.) 
+```{r}
+
+z <- runif(1000)
+Z2Prop <- c(mean(z<0.10),mean(z>0.90),mean(z>0.45 & z<0.55))
+print(Z2Prop)
+
+```
+
+b.) Making successive copies of z, transform your vector of uniform numbers in the following ways:
+
+```{r}
+z2 <- log10(z)
+z2Prop <- c(mean(z2<0.10),mean(z2>0.90),mean(z2>0.45 & z2<0.55)) 
+print(z2Prop)
+
+
+# Z squared 
+
+z3 <- (z^2)
+Z3Prop <- c(mean(z3<0.10),mean(z3>0.90), mean(z3>0.45 & z3<0.55)) 
+print(Z3Prop)
+
+
+# Z^e
+z4 <- exp(z) 
+Z4Prop <- c(mean(z4<0.10),mean(z4>0.90), mean(z4>0.45 & z4<0.55))
+print(Z4Prop)
+
+#Square root 
+
+z5 <- sqrt(z) 
+Z5Prop <- c(mean(z5<0.10),mean(z5>0.90), mean(z5>0.45 & z5<0.55))
+print(Z5Prop)
+
+```
+
