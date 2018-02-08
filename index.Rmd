@@ -1,0 +1,105 @@
+---
+title: "Bio 381 Webpage"
+author: "Luke Daniels"
+date: "1/17/2018"
+Picture: ![](Images/Profile.JPG) 
+output: 
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: textmate
+  rmdformats::html_clean:
+    highlight: kate
+    
+---
+<p align="center">
+
+*I am a senior undergraduate student majoring in Biology!!  Currently, I am working in Dr. Lockwood's lab. In this role I am assisting Emily Mikucki in researching the effects of winter warming on P. rapae. This site contains the work completed in Bio381 during the spring semester 2018*
+
+HELLO ljdflsjdhgjhgjhg
+
+Contact Me! ldaniel1@uvm.edu  
+
+<left> 
+<div style="width:400px; height=500px"; "<left>
+:![](Images/Profile.JPG) 
+
+
+## Helpful Links   
+* [Course Webpage](https://gotellilab.github.io/Bio381/)   
+* [RMarkdown Cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)   
+* [Github website templates](https://github.com/jekyll/jekyll/wiki/Themes)   
+* [R help](http://stackoverflow.com/questions/tagged/r)   
+
+## Homework Solutions and Notes
+
+------
+<div id='id-section1'/>
+#### Week 1: Setting up a webpage 
+[Assignment Page](https://gotellilab.github.io/Bio381/Homeworks/Homework01.html)   
+   
+Due:  
+*Index Page Sucessfully Built*
+1. Met Matthew Perry, Play Guitar   
+2. http://lukedaniels1.github.io  
+3. https://lukedaniels1.github.io/Bio381_2018/ 
+   
+No solution   
+
+------
+<div id='id-section2'/>
+#### Week 2:    
+
+Due: [Experimental Logic Tree](Homework 2.html)
+ 
+
+------
+<div id='id-section3'/>
+#### Week 3: 
+
+Due:   
+       
+------
+<div id='id-section4'/>
+#### Week 4:    
+
+Due:   
+      
+
+------
+<div id='id-section5'/>   
+#### Week 5: 
+Due:   
+   
+ 
+------
+<div id='id-section6'/>   
+#### Week 6: 
+
+------
+<div id='id-section7'/>
+#### Week 7: 
+
+
+------
+<div id='id-section8'/>
+#### Week 8:  
+
+Due:   
+   
+
+------
+<div id='id-section9'/>
+#### Week 9: 
+
+Due:   
+
+------
+<div id='id-section10'/>
+#### Week 10:    
+
+
+------
+<div id='id-section11'/>
+#### Week 11:   
+
+</div>
