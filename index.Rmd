@@ -13,17 +13,14 @@ output:
 ---
 <p align="center">
 
-*I am a senior undergraduate student majoring in Biology!  Currently, I am working in Dr. Lockwood's lab. In this role I am assisting Emily Mikucki in researching the effects of winter warming on P. rapae. This site contains the work completed in Bio381 during the spring semester 2018*
-
-sfgsdfgsfdg
-
-Contact Me! ldaniel1@uvm.edu  
-
-<div style="width:200px; height=200px">
-![](Profile.JPG)
-</div>
+<img src = "Profile.jpg" width = "250" height = "200" align = "left" /> 
 
 
+*I am a senior undergraduate student majoring in Biology!  Currently, I am working in Dr. Lockwood's lab. In this role I am assisting Emily Mikucki in researching the effects of winter warming on P. rapae. This site contains the work completed in Bio381 during the spring semester 2018*  
+
+Contact Me! ldaniel1@uvm.edu
+
+<br/>
 
 
 ## Helpful Links   
