@@ -55,7 +55,7 @@ Due: [Experimental Logic Tree](Homework 2.html)
 <div id='id-section3'/>
 #### Week 3: 
 
-Due:   
+Due: [Beamer Slides](Beamer_Slides_HW_3.pdf)
        
 ------
 <div id='id-section4'/>
