@@ -67,7 +67,7 @@ Due: [HW 4: All Things Vectors](Bio381_Lab_HW_4.html)
 ------
 <div id='id-section5'/>   
 #### Week 5: 
-Due:   
+Due:  [Regular Expressions](Homework_5.html)
    
  
 ------

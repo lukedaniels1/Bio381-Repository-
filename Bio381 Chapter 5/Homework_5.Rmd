@@ -1,0 +1,54 @@
+---
+title: "Homework 5"
+author: "Luke Daniels"
+date: "2/14/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+1.) 
+
+```{r}
+#Find: \s{2,}
+#Replace: , 
+```
+
+
+  
+2.) 
+```{r}
+#Find: (\w+),\s(\w+), (.*)
+#Replace:\2 \1 (\3)
+```
+
+3.)
+
+```{r}
+#Find: \s(\d{3,})
+#Replace: n \1
+```
+
+b.) 
+
+```{r}
+#Find: (\d{4})(.*)(\w+)(\.\w+)
+#Replace: \2 \3_\1\4
+```
+
+4.
+```{r}
+#Find: (\w)\w+,(\w\w+),\d+.\d+,(\d*)
+#Replace: \1_\2, \3
+```
+
+
+b.) 
+
+```{r}
+#Find: (\w)\w+,(\w{4})(\w+),\d+.\d+,(\d*)
+#Replace: \1_\2, \4
+```
