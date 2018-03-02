@@ -73,6 +73,8 @@ Due:  [Regular Expressions](Homework_5.html)
 <div id='id-section6'/>   
 #### Week 6: 
 
+[Probability Distributions](Homework_6.html) 
+
 ------
 <div id='id-section7'/>
 #### Week 7: 
