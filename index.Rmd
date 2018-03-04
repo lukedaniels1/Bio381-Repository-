@@ -73,6 +73,8 @@ Due: [Probability Distributions](Homework_6.html)
 <div id='id-section7'/>
 #### Week 7: 
 
+Due: Not Finalized! [Functions](Homework_7.html)
+
 
 ------
 <div id='id-section8'/>

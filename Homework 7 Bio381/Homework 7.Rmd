@@ -1,0 +1,165 @@
+---
+title: "Homework_7"
+author: "Luke Daniels"
+date: "3/3/2018"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(ggplot2)
+```
+
+
+*Question 2.) Specifying sample size, means, and variances for each group*
+
+Data is comming from estimated metabolic rates of crickets for two different temperature treatments 
+
+Mean Low: 1.5
+SD: 1   
+Mean High: 2.25
+SD: 2  # Higher Standard Deviation with Temp
+N: 300 
+
+*Question 3.) Write a function to create a data set that uses the specified parameters*
+
+* The arguments of this function are the treatment names, sizes and means in vector form.  
+* The response variable "MetaRate" is created from the arguments. 
+* The treatment groups variable "TGroup" is created by replicating the values in both Name and Size vector 
+* The function returns the data frame with the response variable and treatment groups given our parameters 
+```{r}
+myFunction <- function(nGroup = 2, nName1 = c("Low", "High"),
+                       nSize1 = c(50,50), nMean1 =c(1.5,2.25)){
+  ID <- 1:100
+  MetaRate <- c(rnorm(n=nSize1[1], mean= nMean1[1],sd = 1),
+              rnorm(n=nSize1[2], mean= nMean1[2],sd = 2))
+  TGroup <- rep(nName1,nSize1) 
+  ANOdata <- data.frame(ID, TGroup, MetaRate)
+  return(ANOdata)
+}
+```
+
+Our desired data frame is created by assigning myFunction to the global environment 
+
+```{r}
+myDF <- myFunction()
+```
+
+
+*Question 4.) Now write a simple function to analyze the data (probably as an ANOVA or regression analysis, but possibly as a logistic regression or contingency table analysis. Write anothe function to generate a useful graph of the data.*
+
+```{r}
+myDF <- myFunction()
+
+ANOmodel <- aov(myDF$MetaRate ~ myDF$TGroup, data = myDF)
+print(ANOmodel) 
+summary(ANOmodel) 
+
+plot(myDF$TGroup, myDF$MetaRate)
+```
+
+*Question 5.) Try running your analysis multiple times to get a feeling for how variable the results are with the same parameters, but different sets of random numbers.*
+
+Repeat # 2: Same Parameters 
+
+```{r}
+myFunction <- function(nGroup = 2, nName1 = c("Low", "High"),
+                       nSize1 = c(50,50), nMean1 =c(1.5,2.25)){
+  ID <- 1:100
+  MetaRate <- c(rnorm(n=nSize1[1], mean= nMean1[1],sd = 1),
+              rnorm(n=nSize1[2], mean= nMean1[2],sd = 2))
+  TGroup <- rep(nName1,nSize1) 
+  ANOdata <- data.frame(ID, TGroup, MetaRate)
+  return(ANOdata)
+}
+
+myDF <- myFunction()
+myDF <- myFunction()
+
+ANOmodel <- aov(myDF$MetaRate ~ myDF$TGroup, data = myDF)
+print(ANOmodel) 
+summary(ANOmodel) 
+
+plot(myDF$TGroup, myDF$MetaRate)
+```
+
+Repeat # 2: Using Original Parameters
+
+```{r}
+myFunction <- function(nGroup = 2, nName1 = c("Low", "High"),
+                       nSize1 = c(50,50), nMean1 =c(1.5,2.25)){
+  ID <- 1:100
+  MetaRate <- c(rnorm(n=nSize1[1], mean= nMean1[1],sd = 1),
+              rnorm(n=nSize1[2], mean= nMean1[2],sd = 2))
+  TGroup <- rep(nName1,nSize1) 
+  ANOdata <- data.frame(ID, TGroup, MetaRate)
+  return(ANOdata)
+}
+
+myDF <- myFunction()
+myDF <- myFunction()
+
+ANOmodel <- aov(myDF$MetaRate ~ myDF$TGroup, data = myDF)
+print(ANOmodel) 
+summary(ANOmodel) 
+
+plot(myDF$TGroup, myDF$MetaRate)
+```
+
+From these two repeats, we see different results with the same parameters due to random numbers. 
+
+*Question 6: Now begin adjusting the means of the different groups. Given the sample sizes you have chosen, how small can the differences between the groups be (the “effect size”) for you to still detect a significant pattern (p < 0.05).*
+
+If we decrease the mean metabolic rate for a high temperature by 0.15 the results are border-line significant 
+
+```{r}
+myFunction <- function(nGroup = 2, nName1 = c("Low", "High"),
+                       nSize1 = c(50,50), nMean1 =c(1.5,2.1)){
+  ID <- 1:100
+  MetaRate <- c(rnorm(n=nSize1[1], mean= nMean1[1],sd = 1),
+              rnorm(n=nSize1[2], mean= nMean1[2],sd = 2))
+  TGroup <- rep(nName1,nSize1) 
+  ANOdata <- data.frame(ID, TGroup, MetaRate)
+  return(ANOdata)
+}
+
+myDF <- myFunction()
+myDF <- myFunction()
+
+ANOmodel <- aov(myDF$MetaRate ~ myDF$TGroup, data = myDF)
+print(ANOmodel) 
+summary(ANOmodel) 
+
+plot(myDF$TGroup, myDF$MetaRate)
+```
+
+*Question 7: Alternatively, for the effect sizes you originally hypothesized, what is the minimum sample size you would need in order to detect a statistically significant effect. Again, run the model a few times with the same parameter set to get a feeling for the effect of random variation in the data.*
+
+If we reduce the sample size to half, there is never a significant difference. 
+
+```{r}
+myFunction <- function(nGroup = 2, nName1 = c("Low", "High"),
+                       nSize1 = c(25,25), nMean1 =c(1.5,2.1)){
+  ID <- 1:100
+  MetaRate <- c(rnorm(n=nSize1[1], mean= nMean1[1],sd = 1),
+              rnorm(n=nSize1[2], mean= nMean1[2],sd = 2))
+  TGroup <- rep(nName1,nSize1) 
+  ANOdata <- data.frame(ID, TGroup, MetaRate)
+  return(ANOdata)
+}
+
+myDF <- myFunction()
+myDF <- myFunction()
+
+ANOmodel <- aov(myDF$MetaRate ~ myDF$TGroup, data = myDF)
+print(ANOmodel) 
+summary(ANOmodel) 
+
+plot(myDF$TGroup, myDF$MetaRate)
+```
+
+
