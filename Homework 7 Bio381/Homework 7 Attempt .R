@@ -50,15 +50,12 @@ AnoFunction()
   
   
   
-  
 # ------- Ggplot Box Plot 
-ANOplot <- ggplot(data = myDF, aes(x=myDF$TGroup,y=myDF$resVar, fill = myDF$TGroup))+
-                    geom_boxplot(colour = "Black")+ 
-  scale_y_continuous(name = "Metabolic Rate")+ 
-  scale_x_discrete(name = "Temperature Treatment") +
-  ggtitle("Metabolic Rates in High vs Low Temperature")+
-  theme_bw()
-  ANOplot
+ANOplot <- function(data=myDF){
+  plot <- ggplot(data = myDF, aes(x=myDF$TGroup,y=myDF$resVar, fill = myDF$TGroup))
+  return(plot)
+}
+print(ANOplot)
   #---------------------------------------- Number 2 
 
   
@@ -155,3 +152,27 @@ ANOplot
 # basic ggplot of ANOVA data 
 
 #---------------------------------------- Number 4
+
+
+ANOplot <- function(data=myDF){
+  PlotAno <- ggplot(data = myDF,
+                    aes(x=myDF$TGroup,
+                        y=myDF$resVar,
+                        fill= myDF$TGroup))+
+    geom_boxplot(colour = "Black")+
+    scale_y_continuous(name = "Metabolic Rate")+ 
+    scale_x_discrete(name = "Temperature Treatement")+ 
+    ggtitle("Metabolic Rates in High vs Low Temperature")+
+    theme_bw()
+  return(PlotAno)
+  }
+  ANOplot(myDF)
+  
+  
+  ggplot(data = myDF, aes(x=myDF$TGroup,y=myDF$resVar, fill = myDF$TGroup))+
+  geom_boxplot(colour = "Black")+ 
+  scale_y_continuous(name = "Metabolic Rate")+ 
+  scale_x_discrete(name = "Temperature Treatment") +
+  ggtitle("Metabolic Rates in High vs Low Temperature")+
+  theme_bw()
+ANOplot

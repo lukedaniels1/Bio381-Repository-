@@ -91,7 +91,9 @@ Due:
 
 ------
 <div id='id-section10'/>
-#### Week 10:    
+#### Week 10:
+
+Due: [Batch Processing](Homework_10.html)
 
 
 ------

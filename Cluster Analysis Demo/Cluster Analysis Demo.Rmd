@@ -1,0 +1,402 @@
+---
+title: "Cluster Analysis In R"
+author: "Luke T. Daniels"
+date: "4/1/2018"
+output: pdf_document
+---
+Cluster analysis in R is a great tool to find trends and patterns in data.  Clustering allows users to identify which observations are alile across many different variables. The power of cluster analysis allows us to perform complex analyses that would be near impossible without programs such as R.  
+
+This demonstration serves as an a brief introduction to the statistics behind cluster analysis and the corresponding tools in R.  I will highlight the differences in base `R` and packages such as `factoextra` and `cluster`.  First I will begin my introducing K-means clustering 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+\ 
+
+## *Preparring Data* 
+
+1.) Rows must be observations and columns must be variables. 
+2.) Missing values must be removed or estimated.
+
+3.) The data must be standardized to make variables comparable. 
+
+```{r, results='hide'}
+data("USArrests")
+df <- USArrests
+df <- na.omit(df) #Removes any missing values
+df.scaled <- scale(df)  #We standardize the data using the function scale()
+
+
+```
+\ 
+
+## *Required R Packages*
+\ 
+
+1.) **cluster**: Computes clustering algorithms 
+\ 
+
+
+2.) **factorextra**: Used for ggplot2 visualization of clustering results 
+
+```{r results='hide'}
+library(ggplot2)
+library(factoextra)
+library(cluster)
+library(latexpdf)
+library(purrr)
+```
+
+## **Distance Measures**
+\ 
+The classification of items into groups requires computation od the distance or similarity between each observation. Distance measures defines how similar two elements (x,y) are and will influence the shape of the clusters.
+
+There are many methods to calculating the distance between observations.  The most popular method is Euclidean Distance. 
+
+
+1. Euclidian Distance: 
+
+\[
+deuc(x,y)=\sum_i = \ln(x_i - y_i)2d(x,y) = \sqrt(\sum_{i=1}^n(x_1 - y_1)^2)
+\]
+
+
+Other measures, such as the Pearson Equation use correlation based methods.
+
+2. Pearson Correlation Distance
+
+\[
+dcor(x,y)= 1-\sum_i = \ln(xi-x)(yi-y)\sum_1= \ln(x1-x)2\sum_i=ln(y_i-y)2d_{cor}(x,y)= 1- \frac{\sum\limits_{i=n}^n(x_i - \bar{x})(y_i - \bar{y})}{\sqrt(\sum\limits_{i=1}^n(x_i-\bar{x}^2\sum\limits_{i=1}^n(y_i-\bar{y}^2)}
+\]
+
+
+A correlation based distance considers objects similar if their features are highly correlated even if the Euclidean distance is not.  If there are observations with the same profiles but with different magnitudes - use correlation-based.  
+
+In a Euclidean analysis, observations with high values will be clustered together. 
+
+Other methods to consider: Manhattan distance, Spearman Correlation, Kendall Correlation 
+
+\ 
+
+## *Caluclating Euclidean Distance in R*
+\  
+
+**Function 1 Daisy **
+\ 
+
+
+* The *daisy* function in `cluster` handles different variable types (binary, ordinal, nominal) and computes a distance matrix
+
+\  
+
+* In the daisy function we can indicate which distance measurment equation we would like to use.  "Gower" is best where the data contain non-numeric columns.
+
+\ 
+
+* The metric will be the *Gowers Coefficient*
++ It indicates the % average similarity between all pairs of observations
+
+\ 
+
+*daisy(x, metric = c("euclidean", "manhattan", "gower"), stand = FALSE, type = list(), weights = rep.int(1, p), warnBin = warnType, warnAsym = warnType, warnConst = warnType, warnType = TRUE)*
+
+\ 
+
+The values in the matrix represent the distance between objects. A value of zero indicates that the two items are not different.
+\ 
+
+```{r, results = 'hide'}
+disteucl <- daisy(df.scaled, metric = "gower", stand= FALSE)
+disteucl                                         
+
+euclmatrix <- as.matrix(disteucl)
+
+
+```
+\ 
+
+
+We have now created a distance matrix! 
+ 
+
+```{r, results='hide'}
+head(euclmatrix)
+```
+
+\ 
+
+**Fuction 2 fviz_dist()** 
+ 
+\ 
+
+An easy way to vizualize a distance matrix is to use fviz_dist() from the `factoextra` package
+
+\ 
+
+*fviz_dist(dist.obj, order = TRUE, show_labels = TRUE, lab_size = NULL, gradient = list(low = "red", mid = "white", high = "blue"))*
+\ 
+
+The Value indicates the level of dissimilarity.  Zero means the two are exactly similar. 
+ 
+\ 
+
+```{r}
+fviz_dist(disteucl, order = TRUE, show_labels = TRUE, lab_size = 4, gradient = list(low = "red", mid = "white", high = "blue"))
+
+```
+
+\ 
+
+# **K-Mean Clustering**
+\ 
+
+
+## Main Idea: 
+
+\ 
+
+Define clusters so that the total intra-cluster variation is minimized. There a many k-means algorithms available but the most commonly used is the Hartigan-Wong algorithm.  This equation defines the total within cluster variation as the sum of squared distances Euclidean distances between items and the corresponding centroid
+ 
+\ 
+
+*Total Within Cluster Sum of Squares Equation*
+
+\[
+tot.withinss = \sum_k = 1kW(Ck) = \sum_k=1k\sum_x\epsilon Ck(x_i -\mu k )2 tot.withinss \sum\limits_{k=1}^k W(C_k)=\sum\limits_{k=1}^k\sum\limits_{x_i\in C_k}(x_ - \mu_k)^2
+\]
+ 
+
+Each observation of xi_k is assigned to a cluster so that the sum of squares distance of the observation to their assigned cluster centers mu_k is minimized
+This equation measures the compactness of the clustering - we want it to be minimized.
+ 
+\ 
+
+**The Hartigon Wong algorithm requires the user to estimate the value of k clusters.** 
+\  
+
+### Hartigon Wong Equation In Action!
+ 
+\ 
+
+```{r, results='hide'}
+kmeans(df.scaled, centers = 3, iter.max = 10, nstart = 1)
+```
+
+The algorithm start by selecting k objects from the data set to serve as the intitial centers.  These are known as centroids. Each object is then assigned to the closes centroid defined by the Euclidean distance.  After this assignment, the algorithm computes the new mean value of each cluster. Every observation is checked again to see if it is actually closer to another cluster. This occurs until the cluster assignments stop changing. 
+\  
+
+The main problem is that if we choose the wrong k, then the whole analysis is wrong! Human error! 
+ 
+\ 
+
+## **How Do We Choose the Right Number of K Clusters?**
+ 
+\ 
+
+There are three methods to determine the optimal clusters:
+
+1.) Elbow Method
+2.) Silhouette Method 
+3.) Gap Statistic. 
+
+\ 
+
+### **Elbow Method**
+ 
+\ 
+
+Clusters must be defined so that the total within cluster variation is minimized 
+ 
+\[
+minimize(\sum\limits_{k=1}^kW(C_k)
+\]
+is the kth cluster and  is the within cluster variation. 
+
+
+#### The Elbow Method Using Base R 
+\ 
+
+
+```{r}
+set.seed(123)
+# function to compute the total within-cluster sum of squares
+wss <- function(k){kmeans(df, k, nstart = 10)$tot.withinss
+}
+
+# Compute and plot wss for k = 1 to k = 15 
+k.values <- 1:15 
+
+# Extract wss for 2- 15 clusters and plot 
+
+wss_values <- map_dbl(k.values, wss) # The mapl function transforms input by applying a function to each element
+
+plot(k.values, wss_values, type = "b", pch = 19, frame = FALSE,
+     xlab = "Number of clusters K",
+     ylab = "Total within-clusters sum of squares")
+
+```
+
+\ 
+
+#### The Elbow Method in Factoextra
+\ 
+
+We rely on the 'factoextra' package once again. The "bend in the knee" in the graph below is considered to be the appropriate number of clusters 
+
+```{r}
+fviz_nbclust(df.scaled, kmeans, method = "wss")
+```
+
+```{r}
+fviz_nbclust(df.scaled, kmeans, method = "wss") + 
+  geom_vline(xintercept = 4, linetype = 3)
+```
+
+\ 
+
+
+### ** Silhouette Method**
+ 
+\ 
+
+This approach measures the quality of clusters. It determines how well each object lies within the cluster. This algorithm computes the average silhouette of observations for different values of k.  The optimal number of cluster k is the one that maximizes the average silhouette over a range of possible values 
+ 
+\ 
+
+#### In base R
+
+\ 
+
+```{r}
+#Function to compute the average silhouette for k cluseter
+
+
+#avg_sil <- function(k){ 
+#  km.res <- kmeans(df, centers = k, nstart = 25)
+ #ss <- silhouette(km.res$cluster, dist(df))
+ # mean(ss[, 3])
+#}
+
+# Compute and plot wss for k = 2 to k =15
+k.values <- 2:15
+
+#extracting silhouettes
+#avg_sil_values <- map_dbl(k.values, avg_sil)
+
+#plot(k.values, avg_sil_values,
+#type = "b", pch = 19, frame = FALSE, 
+#xlab = "Number of Cluster K",
+#ylab = "Average Silhouettes")
+```
+
+There will be an easier way of calculating silhouettes later in this demonstration!
+\ 
+ 
+
+## **Computing the Means with K = 4 Clusters**
+
+\ 
+
+Remember, using the k-means approach, the center of a cluster is defined as being the average of all the points within a cluster!
+
+```{r}
+set.seed(100)  # Since the alogorithm starts with k randomly selected centers we must set the seed 
+km.res <- kmeans(df, 4, nstart = 50) # R will try 50 different random starting assignments and then select the result corresponding to the lowest within cluster variation 
+km.res
+```
+\ 
+
+Now we have classified each unit by their respective cluster.  This model has a good fit (90.2%)
+
+Now that each unit has been assigned a cluster, we can calculate the cluster means 
+\ 
+
+```{r}
+aggregate(USArrests, by=list(cluster= km.res$cluster),mean)
+```
+\ 
+
+We can add the cluster assignments to the original data frame
+
+```{r}
+df <- cbind(USArrests, cluster = km.res$cluster)
+head(df)
+```
+\ 
+
+Finally, we can vizualize
+
+```{r}
+fviz_cluster( km.res, data = df, palette = c("Red", "Blue", "Green", "Purple"), 
+              ellipse.type = "euclid", star.plot = TRUE, 
+              repel = TRUE, 
+              ggtheme = theme_minimal())
+```
+
+\ 
+
+
+
+# **The PAM Approach**
+\ 
+
+In the K-mean approach above, the center of a cluster is calculated as the mean value of all the data points in a cluster.  This makes the K-means approach very sensitive to outliers and noise. 
+
+The K-mediod approach using the PAM algorithm is more robust and therefore less sensitive to outliers.  A mediod is an object within a cluster for which the average dissimilarity between it and all the other objects in a cluster is minimal. (The most centrally located point).  This point is representative of the cluster and less skewed by outliers. 
+
+1.) **Estimate K- Clusters Using Silohette Method in "factoextra"**
+
+The idea of using the silhoutte method is to compute PAM using different values of clusters k. 
+
+To estimate the optimal number of clusters, we'll use the average silhouette method. The idea is to compute PAM algorithm using different values of clusters k. Next, the average clusters silhouette is drawn according to the number of clusters. The average silhouette measures the quality of a clustering. A high average silhouette width indicates a good clustering. The optimal number of clusters k is the one that maximize the average silhouette over a range of possible values for k.
+
+
+```{r}
+fviz_nbclust( df, pam, method = "silhouette") + theme_classic()
+
+```
+
+* The maximum silhouette width occurs at k=2, suggesting that the optimal number of clusters is 2! 
+
+
+### Computing the PAM Clustering
+
+**Function 3 pam()**
+
+*pam(x, k, metric = "euclidean", stand = FALSE)*
+* x is the disimilarity matrix created from the daisy() function 
+* k is the number of clusters 
+* stand is logical value, if true the columns in x were standardized before calculating disimilarities. This is ignored when x is a disimilarity matrix.
+
+```{r}
+pam.res <- pam(df, 2)
+pam.res
+```
+
+\ 
+
+The pam() function returns the mediod objects!  To access these:
+
+```{r}
+pam.res$medoids
+```
+
+
+Finally we can plot the 2 new clusters! 
+
+```{r}
+fviz_cluster( pam.res, palette = c("blue", "red"), 
+              ellipse.type = "t", 
+              repel = TRUE,  # Avoids overplotting labels
+              ggtheme = theme_classic() )
+              
+```
+\ 
+
+# **Hierarhical Clustering** 
+
+\ 
+
+In contrast to partitioning clustering, hierarhical clustering does not require pre-specification of clusters!
+
+## Method 1: Agglomerative Clustering
