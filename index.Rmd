@@ -100,4 +100,12 @@ Due: [Batch Processing](Homework_10.html)
 <div id='id-section11'/>
 #### Week 11:   
 
+Due: [Function Plotting & Randomization](Homework_11.html)
+
 </div>
+
+------
+<div id='id-section11'/>
+#### Week 12: 
+
+Due: [ggplot graphics](Homework_12.html)

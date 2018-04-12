@@ -1,0 +1,110 @@
+---
+title: "Homework_12"
+author: "Luke Daniels"
+date: "4/11/2018"
+output: html_document
+---
+
+For this ggplot demonstration, I will be using the R data set "USarrest".  Here is the structure: 
+
+```{r}
+library(ggplot2)
+library(patchwork)
+library(maps) 
+library(readxl)
+library(openxlsx)
+head(USArrests)
+```
+
+As we can see this is state / location data.  It would be nice to view this data on a map to observe general trends. For this we utilize the "maps" package. 
+
+```{r}
+crimes <- data.frame(state = tolower(rownames(USArrests)), USArrests)
+
+
+
+states_map <- map_data("state")
+map1 <- ggplot(crimes, aes(map_id = state)) + geom_map(aes(fill = Murder), map = states_map) + expand_limits(x = states_map$long, y = states_map$lat)
+last_plot() + coord_map()
+
+
+states_map2 <- map_data("state")
+map2 <- ggplot(crimes, aes(map_id = state)) + geom_map(aes(fill = Assault), map = states_map2) + expand_limits(x = states_map$long, y = states_map$lat)
+last_plot() + coord_map()
+
+
+
+```
+
+
+To see the initial trend we will plot geom_smooth using 'loess' 
+
+```{r}
+Plot1 <- ggplot(USArrests, mapping = aes(x = UrbanPop, y = Assault)) + 
+  geom_point()+
+  geom_smooth()
+Plot1
+```
+
+\ 
+
+
+We can view the relationship between Population and Assualt Rates for each state.  However I acknowledge that this is a **bad** method since we cannot pinpoint each state.  It does demonstrate the power of ggplot! 
+```{r}
+Data <- read_excel("Data.xlsx")
+
+gg <- ggplot(Data, aes(x=UrbanPop, y=Assault)) + 
+  geom_point(aes(col=State)) + 
+  geom_smooth(method="loess", se=F) + 
+  labs(subtitle="Population Vs Assault", 
+       y="Assalt", 
+       x="UrbanPopulation", 
+       title="Scatterplot")
+
+plot(gg)
+```
+
+Furthermore we could make each data point a function of Rape levels as well.  To do this we map the points to size = Rape. 
+
+```{r}
+g3 <- ggplot(Data, aes(x=UrbanPop, y=Assault)) + 
+  geom_point(aes(col=State, size = Rape)) + 
+  geom_smooth(method="loess", se=F) + 
+  labs(subtitle="Population Vs Assault", 
+       y="Assalt", 
+       x="UrbanPopulation", 
+       title="Scatterplot")
+
+plot(g3)
+```
+As we discussed in class, this is information overload!  But we have managed to represent four different variables: State, Population, Assault and Rape. 
+
+\ 
+
+Maybe a simplier way to view these relationships is by using text to represent each point.  We can easily change the test size as well.  The command "check_overlap = TRUE" is useful to make sure the text does not over lap so it is clearly visible! 
+```{r}
+g4 <- ggplot(Data,
+       aes(UrbanPop, Murder, label = as.character(State))) + theme_classic() +
+  geom_text(check_overlap = TRUE, size = 3) 
+  
+g4
+```
+\ 
+
+These types of graphs can be manipulated very easily.  If we ever wanted to angle the text we simply indicate the angle we want.  In this case its a 45 degree angle. 
+
+```{r}
+g5 <- ggplot(Data,
+             aes(UrbanPop, Murder, label = as.character(State))) + theme_classic() +
+  geom_text(angle =45, size = 3)
+g5
+```
+
+
+\ 
+
+Using 'Patchwork' we can combine multiple graphs 
+```{r}
+map1 + Plot1 - g5 + plot_layout(ncol = 1)
+```
+
