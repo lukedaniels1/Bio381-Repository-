@@ -4,7 +4,7 @@ author: "Luke T. Daniels"
 date: "4/1/2018"
 output: pdf_document
 ---
-Cluster analysis in R is a great tool to find trends and patterns in data.  Clustering allows users to identify which observations are alile across many different variables. The power of cluster analysis allows us to perform complex analyses that would be near impossible without programs such as R.  
+Cluster analysis in R is a great tool to find trends and patterns in data. Many people think of statistics as giving definitive answers to questions, however, there are techniques that simply provide further insight into data. Clustering allows users to identify which observations are alike across many different variables. The power of cluster analysis allows us to perform complex analyses that would be near impossible without programs such as R.  
 
 This demonstration serves as an a brief introduction to the statistics behind cluster analysis and the corresponding tools in R.  I will highlight the differences in base `R` and packages such as `factoextra` and `cluster`.  First I will begin my introducing K-means clustering 
 
@@ -13,12 +13,21 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 \ 
 
-## *Preparring Data* 
+## ** Decide on the Clustering Variables**
+
+Cluster analysis has no mechanism for differentiating between relevant and irrelevant variables.  There must be careful consideration for the variables included in the analysis.  There should be signficant differences between the variables. There are select pricipals that should be followed. 
+\ 
+1.) Avoid using an abundance of variables since this increases the odds that variables are no longer dissimilar.
+2.) If there is a high degree of collinearity, specific aspects covered by these variables will be overrepresented. 
+3.) Formann (1984) recommends a sample size of at least 2^m^ where m equals the number of clustering variables 
+
+## **Data Preparation**
 
 1.) Rows must be observations and columns must be variables. 
 2.) Missing values must be removed or estimated.
-
-3.) The data must be standardized to make variables comparable. 
+3.) The data must be standardized to make variables comparable.
+4.) The data used in cluster analysis can be interval, ordinal or categorical 
+* There are different methods / calculations that are better for dealing with each type of data type. 
 
 ```{r, results='hide'}
 data("USArrests")
@@ -29,6 +38,11 @@ df.scaled <- scale(df)  #We standardize the data using the function scale()
 
 ```
 \ 
+
+### **Standardization**
+
+One very important decision that needs to be made involves the scales of the variables being measured.  If one of the variables is measured on a much larger scale than the other variables, then whatever measure is used will be overly influenced by that variable.  For example, if we are looking at the distance between two people based on their IQs and incomes in dollars, the differences in incomes would dominate the distance measurments. We can solve this issue by standardizing the variables! bo
+
 
 ## *Required R Packages*
 \ 
@@ -47,11 +61,25 @@ library(latexpdf)
 library(purrr)
 ```
 
+# **Approach #1: Partitioning Methods (K-Means)**
+Basically K- mean is an interative process that divides a given data set into K disjoint groups
+
+It starts by placing k centroids randomly in your space. Then you iteraviley do the following: First we run through our data set and for each individual we find the nearest centroid to that individual. To do that, for each $x_i$ you compute the distance between in a $c_j$ (each cluster). This is the Eucleadian Distance. Then you pick the cluster that has the minimum distance of all (nearest cluster). 
+
+Then you assign $x_i$ to that nearest cluster. This process occurs for each individual, so each individual minimizes is distances to the randomly positioned centroid.  Now we need to recompute the centroid by getting the average of all the $x_i$ that was assigned to that cluster. ( All the $x_i$'s that were assigned to the jth cluster and you average them out.) 
+
+At this point we are restricting the analysis to continous variables.  We cannot take the average or distance of categorical variables. 
+
+These are the two basic steps.  You keep running theses steps until no individuals change cluster memberships 
+
+
 ## **Distance Measures**
 \ 
+K means is implicitly based on pairwise Euclidean distances because the sum of squared deviations from the centroid is equal to the sum of pairwise squared Euclidean distances divided by the Number of Points. A centroid is a multivariate mean in euclidiean spaces.  Euclidean spaces is about euclidean distances. 
+
 The classification of items into groups requires computation od the distance or similarity between each observation. Distance measures defines how similar two elements (x,y) are and will influence the shape of the clusters.
 
-There are many methods to calculating the distance between observations.  The most popular method is Euclidean Distance. 
+There are many methods to calculating the distance between observations.  The most popular method is Euclidean Distance. An important note is that the *Euclidean* method is often considered the best for dealing with interval data. 
 
 
 1. Euclidian Distance: 
@@ -147,7 +175,7 @@ fviz_dist(disteucl, order = TRUE, show_labels = TRUE, lab_size = 4, gradient = l
 
 \ 
 
-# **K-Mean Clustering**
+## **K-Means Clustering ~ Assigning Clusters**
 \ 
 
 
@@ -182,7 +210,7 @@ This equation measures the compactness of the clustering - we want it to be mini
 kmeans(df.scaled, centers = 3, iter.max = 10, nstart = 1)
 ```
 
-The algorithm start by selecting k objects from the data set to serve as the intitial centers.  These are known as centroids. Each object is then assigned to the closes centroid defined by the Euclidean distance.  After this assignment, the algorithm computes the new mean value of each cluster. Every observation is checked again to see if it is actually closer to another cluster. This occurs until the cluster assignments stop changing. 
+The algorithm starts by selecting k objects from the data set to serve as the intitial centers.  These are known as centroids. Each object is then assigned to the closes centroid defined by the Euclidean distance.  After this assignment, the algorithm computes the new mean value of each cluster. Every observation is checked again to see if it is actually closer to another cluster. This occurs until the cluster assignments stop changing. 
 \  
 
 The main problem is that if we choose the wrong k, then the whole analysis is wrong! Human error! 
@@ -220,19 +248,13 @@ is the kth cluster and  is the within cluster variation.
 ```{r}
 set.seed(123)
 # function to compute the total within-cluster sum of squares
-wss <- function(k){kmeans(df, k, nstart = 10)$tot.withinss
-}
+k.max <- 15 
+wss <- sapply(1:k.max, function(k){kmeans(df,k, nstart = 50)$tot.withinss})
+wss
+plot(1:k.max, wss, type = "b", pch= 19, frame = FALSE, 
+     xlab = "Number of Clusters K", 
+     ylab = "Total within-custers sum of squares")
 
-# Compute and plot wss for k = 1 to k = 15 
-k.values <- 1:15 
-
-# Extract wss for 2- 15 clusters and plot 
-
-wss_values <- map_dbl(k.values, wss) # The mapl function transforms input by applying a function to each element
-
-plot(k.values, wss_values, type = "b", pch = 19, frame = FALSE,
-     xlab = "Number of clusters K",
-     ylab = "Total within-clusters sum of squares")
 
 ```
 

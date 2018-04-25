@@ -7,11 +7,4 @@ output:
   html_document: default
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-\[
-deuc( x, y) = \sum_i = \ln(xi - yi)2d_{euc}(x,y) =\sqrt\sum_{i=1}^n(x_1 - y_1)^2}
-\]
  

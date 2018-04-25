@@ -109,3 +109,8 @@ Due: [Function Plotting & Randomization](Homework_11.html)
 #### Week 12: 
 
 Due: [ggplot graphics](Homework_12.html)
+
+
+------
+<div id='id-section11'/>
+#### Class Presentation : [Cluster Analysis](Daniels_Cluster_Analysis_Lecture.html) 
