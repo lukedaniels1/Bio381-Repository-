@@ -73,7 +73,7 @@ Due: [Probability Distributions](Homework_6.html)
 <div id='id-section7'/>
 #### Week 7 / Week 8: 
 
-Due: [Functions](Homework_7.html) 
+Due: [Functions / Creating Fake Data Set](Homework_7.html) 
 
 
 ------
