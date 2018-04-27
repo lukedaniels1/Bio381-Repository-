@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 \ 
 
-## ** Decide on the Clustering Variables**
+## **Decide on the Clustering Variables**
 
 Cluster analysis has no mechanism for differentiating between relevant and irrelevant variables.  There must be careful consideration for the variables included in the analysis.  There should be signficant differences between the variables. There are select pricipals that should be followed. 
 \ 
@@ -108,6 +108,13 @@ Other methods to consider: Manhattan distance, Spearman Correlation, Kendall Cor
 
 ## *Caluclating Euclidean Distance in R*
 \  
+
+
+** Function 2 get_dist()
+
+get_dist(x, method = "euclidean", stand = FALSE, ...)
+fviz_dist(dist.obj, order = TRUE, show_labels = TRUE, lab_size = NULL,
+  gradient = list(low = "red", mid = "white", high = "blue"))
 
 **Function 1 Daisy **
 \ 
@@ -205,6 +212,14 @@ This equation measures the compactness of the clustering - we want it to be mini
 ### Hartigon Wong Equation In Action!
  
 \ 
+kmeans(x, centers, iter.max = 10, nstart = 1,
+       algorithm = c("Hartigan-Wong", "Lloyd", "Forgy",
+                     "MacQueen"), trace=FALSE)
+                     
+* X = The scaled data set 
+* Centers = The Number of K clusters
+* iter.max = The number of iterations to be run.  Should be relatively high 
+* nstart = R will try 25 different random starting starting assignments and then select the best results corresponding to the on within cluster variation. (Strongly recomended 25 - 50)
 
 ```{r, results='hide'}
 kmeans(df.scaled, centers = 3, iter.max = 10, nstart = 1)
@@ -230,8 +245,13 @@ There are three methods to determine the optimal clusters:
 \ 
 
 ### **Elbow Method**
+
+The idea is to compute k-means clustering using different values of clusters k. Then the Within Sum of Squares is drawn according to the number of clusters. 
  
 \ 
+
+
+The Elbow method analyzes the percentage of variance explained as a function of clusters.  If we plot the percentage of variance explained by the clusters against the number of clusters, the first cluster will explain a lot but this will begin to drop to where it explain less and less. 
 
 Clusters must be defined so that the total within cluster variation is minimized 
  
@@ -357,7 +377,17 @@ fviz_cluster( km.res, data = df, palette = c("Red", "Blue", "Green", "Purple"),
 
 \ 
 
+## THE GAP APPROACH 
 
+The Gap Statistic Compares the Total Within intra-cluster variation for different values of k with their expected values under null reference distribution of the data. The estimate of the optimal clusters will be the value that maximizes the gap statistic.  This means that the clustering strucutre is far away from the random uniform distribution of points. 
+
+The algorithm works by: 
+1.) Clustering the observed data by k = 1 - $k_{max}$ and compues the within intra cluster
+2.) Then it generates a random uniform distribution of data and clusters the random data by k = 1 - $k_{max}$
+3.) Computes the estimated gap statistic as the deviation of observed WSS value from its expected value. 4.) It chooses the number of clusters as the smallest value of k such that the gap statistic is within one standard deviation of the gap at k + 1
+
+
+The disadvantage of elbow and average silhouette methods is that they measure a global clustering characteristic only.  A more sophisticated method is to use the gap statistic which provides a statistical procedure to formalize the other two.
 
 # **The PAM Approach**
 \ 
@@ -415,10 +445,101 @@ fviz_cluster( pam.res, palette = c("blue", "red"),
 ```
 \ 
 
-# **Hierarhical Clustering** 
+## **Validating Our Results**
+
+```{r}
+library(fpc)
+hc.res <- eclust(df, "hclust", k= 6 , hc_metric = "euclidean",
+                 hc_method = "ward.D2", graph = FALSE)
+fviz_dend(hc.res, show_labels = TRUE, palette = "jco", repel = TRUE, cex = .5,as.ggplot =TRUE) + 
+  theme(axis.text.x=element_text(size = 10 , angle=90))
+
+km.res <- eclust(df, "kmeans", k = 6, nstart = 25, graph = FALSE)
+fviz_cluster(km.res, geom = "point", ellipse.type = "norm", ggtheme = theme_minimal())
+
+
+fviz_silhouette(km.res, palette = "jco", ggtheme = theme_classic())
+
+
+```
+
+The silhouette coefficient measures how similar an object is to the other objects in its own cluster versus those in the neighbot cluster. 
+\ 
+
+* A value close to 1 indicates that the object is well clustered. In other words, the obkect is similar to the other objects in its group. 
+
+* A value close to -1 indicates that the object is poorly clustered, and that assignment to some other cluster would improve the overal results. 
+
+* We can see that cluster 4 has some negative values which means those observations are not clustered correctly. 
+
+We can find the names of these samples and determine the clusters as the following 
+
+```{r}
+# Extracting silhouette values 
+
+silinfo <- km.res$silinfo
+silinfo
+
+silinfo$clus.avg.widths
+
+# Determining the bad observations 
+km.res$silinfo$widths # Look at the width of each observation 
+sil <- km.res$silinfo$widths
+sil
+neg_sil_index <- which(sil[, 'sil_width'] < 0)
+sil[neg_sil_index, , drop = FALSE]
+```
+
+
+
+
+
+# **Partitioning Clustering: PAM Approach**
+
+Recall that in k-means clustering, the ceter of a given cluster is calculated as the mean value of all the data points in the cluster.  Using this method introduces the potential for large outliers to drastically influence the cluster mean.  
+\ 
+We can solve this using the k-mediod algorithm.  A mediod refers to an object within a cluster for which the average dissimilarity between it and all the other points of the cluster is minimal.  In other words, it is the most centrally located point in the cluster.  Therefore it does not rely on taking the average.  This means that, the algorithm is less sensitive to noise and outliers. 
 
 \ 
 
-In contrast to partitioning clustering, hierarhical clustering does not require pre-specification of clusters!
+We have also been using euclidean distances in our clusters.  If your data contains outliers Manhattan distaances will give a more robust result. While Base R can calculate the PAM approach, the cluster package is much simpliler. 
 
-## Method 1: Agglomerative Clustering
+
+
+# **Hierarchical Clustering**
+
+In contrast to partitioning clustering, hierarchical clustering does not required to pre-specify the number of clusters. 
+
+Agglomerative clusting (AGNES): Each observation is initially considered as a cluster of its own leaf. Then the most similar clusters are successively merged. In this way, agglomerative clustering works in a "bottom up" fashion. 
+
+Steps: 
+1.) Compute disimilarity between every pair of objects
+2.) Based on the disimilarity use algorithm to cluster
+3.) Determine where to cut the hierarchical tree into clusters.
+
+* The data should be numeric!
+
+
+
+
+
+## **Finding the P-Values**
+
+```{r}
+library(pvclust)
+data("lung")
+head(lung)
+View(lung)
+
+set.seed(123)
+ss <- sample(1:73, 30) #extract 20 samples out of
+newdata <- lung[, ss]
+res.pv <- parPvclust(cl = NULL,newdata, method.hclust = "average", method.dist = "correlation", nboot =1000, iseed = NULL)
+
+plot(res.pv, hang = -1, cex = 0.5)
+```
+
+Values on the dendrogram are the Approximately Unbiased P-Values(Red,left).  These are similar to bootstrap values but are more technical.  The Bootstrap P-values are more commonly known (green, right).  In this case, pvclust will bootstrap the columns of the dataset.  An important note is that if you would like to bootstrop the rows, you can transpose the data.
+
+For example a BP value of 55 indicates that these 8 genes ended up in the same cluster 55 runs out of the 100 bootstraps. If the BP is high then the cluster can be supported by the data. 
+

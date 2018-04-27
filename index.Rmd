@@ -80,7 +80,7 @@ Due: [Functions](Homework_7.html)
 <div id='id-section9'/>
 #### Week 9: 
 
-Due:   
+Due: [Structured Programming](Homework_9.html)
 
 ------
 <div id='id-section10'/>
@@ -105,5 +105,9 @@ Due: [ggplot graphics](Homework_12.html)
 
 
 ------
+## **Final Presentation**
+
 <div id='id-section11'/>
 #### Class Presentation : [Cluster Analysis](Daniels_Cluster_Analysis_Lecture.html) 
+#### Extra Resources: [K-Means Explanation](Kmeans.jpeg)
+#### Extra Resources: [Euclidean Distance](EuclidieanDist.jpeg)

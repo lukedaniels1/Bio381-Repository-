@@ -20,6 +20,49 @@ library(cluster)
 library(latexpdf)
 library(purrr)
 
+# Randomize the Swiss Data 
+set.seed(123)
+random_df <- apply(df, 2, function(x){runif(length(x),
+                                            min(x), (max(x)))})
+random_df <- as.data.frame(random_df)
+
+# Standardize the Data 
+
+swiss.scaled <- scale(df)
+random_df.scaled <- scale(random_df)
+
+# We can view the two data sets using factoextra and a Principle COmponent Analysis
+# The fviz_pca is a pricipal component analysis that reduces the dimensionality of the multivariate data 
+
+fviz_pca_ind(prcomp(swiss.scaled), title = "Normal Data", 
+             palette = "jco", geom = "point")
+# The habillage function is useful when there is a categorical variable in the data
+
+fviz_pca_ind(prcomp(iris[,-5]), title = "Habillage Demo", habillage = iris$Species,
+             palette = "jco", geom = "point")
+
+# Back to the Swiss Data
+
+fviz_pca_ind(prcomp(random_df.scaled), title = "Random Data", geom = "point") 
+
+# By comparing the two graphs we can see that the observed data is different from the randomized data
+
+# The Hopkins test, tests the spatial randomness of the data 
+# If the Hopkins Stat is <0.5 then it is unlikely that the data has significant clusters 
+# We use get_clust tendency in the factoextra package 
+
+
+Hopkins <- get_clust_tendency(swiss.scaled, n = nrow(swiss.scaled)-1, graph = TRUE)
+Hopkins$hopkins_stat  # To get the Stat
+# The Stat is 1 - 0.308.  Our Hopkins Stat is 0.692! 
+
+RandomHopkin <- get_clust_tendency(random_df.scaled, n = nrow(swiss.scaled) - 1, graph = TRUE)
+RandomHopkin$hopkins_stat
+# Our Hopkin Stat is 0.52! 
+
+# With a Hopkin Stat of 0.692 we can determine that the swiss data set has clusters.  Furthermore
+# it has a higher stat than the random data set. 
+
 # There are many R functions for computing distances between pairs of observations 
 # 1.) dist() - Base R - Accepts only numeric data! 
 # 2.) get_dist() - - factoextra package - Accepts only numeric data, but supports correlation based distance measures!
@@ -66,7 +109,7 @@ head(dd)
 
 km.res$size #Items in each cluster 
 km.res$centers # The Cluster Means 
-
+km.res$tot.withinss
 # Visuzlizing K- Means 
 swiss
 fviz_cluster(km.res, data = df.scaled, choose.vars = c("Fertility", "Catholic"), stand = TRUE,
@@ -109,6 +152,8 @@ avg_sil <- function(k){
  ss <- silhouette(km.res$cluster, dist(df))
   mean(ss[, 3])
 }
+
+km.res$cluster
 
 # Compute and plot wss for k = 2 to k =15
 k.values <- 2:15
@@ -172,7 +217,7 @@ hc.res <- eclust(df, "hclust", k= 6 , hc_metric = "euclidean",
 fviz_dend(hc.res, show_labels = TRUE, palette = "jco", repel = TRUE, cex = .5,as.ggplot =TRUE) + 
   theme(axis.text.x=element_text(size = 10 , angle=90))
 
-km.res <- eclust(df, "kmeans", k = 6, nstart = 25, graph = FALSE)
+km.res <- eclust(df, "kmeans", k = 2, nstart = 25, graph = FALSE)
 fviz_cluster(km.res, geom = "point", ellipse.type = "norm", ggtheme = theme_minimal())
 
 
@@ -226,7 +271,19 @@ fviz_cluster(pam.res, data = DataNew, choose.vars = NULL, stand = TRUE,
              ylab = NULL, outlier.color = "black", outlier.shape = 19,
              ggtheme = theme_classic())
 
+km.res <- eclust(df, "pam", nboot = 300, stand = TRUE, graph = TRUE)
 
+nb <- NbClust(df, distance = "euclidean", min.nc = 2,   
+              #NbClust package provides 30 indices for determining the number of clusters and proposes to user the best clustering scheme from the different results obtained by varying all combinations of number of clusters, distance measures, and clustering methods.
+              max.nc = 10, method = NULL)
+fviz_nbclust(nb)
+
+fviz_nbclust(x = df, FUNcluster = cluster::pam, method = "gap_stat", nboot = 500) + 
+  labs(subtitle = "Gap Statistic Method")
+fviz_cluster(km.res, df,  geom = "point", ellipse.type = "norm", ggtheme = theme_minimal())
+
+fviz_nbclust(df, cluster::pam, method = "silhouette") + theme_classic()
+fviz_nbclust(df, FUNcluster = kmeans, method = "wss")
 #########################################################
 # Hierarchical Clustering #
 
@@ -238,6 +295,10 @@ res.dist <- dist(swiss, method= "euclidean")
 # pairs of objects into clusters based on their similarity. 
 
 res.hc <- hclust(d = res.dist, method = "ward.D2") #ward minimizes the total within-cluster variance 
+
+nb <- NbClust(df, distance = "euclidean", min.nc = 2,   
+              #NbClust package provides 30 indices for determining the number of clusters and proposes to user the best clustering scheme from the different results obtained by varying all combinations of number of clusters, distance measures, and clustering methods.
+              max.nc = 10, method = "ward.D2")
 
 #Print Dendogram 
 
@@ -275,6 +336,8 @@ res.agnes <- agnes(x = df, #data frame
                    stand = TRUE, #standardize the data
                    metric = "euclidiean", #metric for distance matrix 
                    method = "ward") #Linkage Method
+
+summary(res.agnes)
 
 
 fviz_dend(res.agnes, cex = 0.6, k =4, rect = TRUE) #Now we don't need the long code to cut the tree in order to visualize
@@ -358,7 +421,7 @@ View(lung)
 set.seed(123)
 ss <- sample(1:73, 30) #extract 20 samples out of
 newdata <- lung[, ss]
-res.pv <- parPvclust(cl = NULL,newdata, method.hclust = "average", method.dist = "correlation", nboot =1000, iseed = NULL)
+res.pv <- parPvclust(cl = NULL,newdata, method.hclust = "average", method.dist = "correlation", nboot =300, iseed = NULL)
 
 plot(res.pv, hang = -1, cex = 0.5)
 
